@@ -11,7 +11,7 @@ try {
 } catch (err) {
   if (!(err instanceof Deno.errors.AlreadyExists)) {
     console.error("Failed to create data directory:", err);
-    Deno.exit(1);
+    // Remove Deno.exit(1) and just log the error
   }
 }
 
@@ -90,6 +90,5 @@ router.post("/api/restaurants", async (context) => {
     context.response.body = { error: "Failed to save restaurant" };
   }
 });
-
-console.log("Server running on http://localhost:8000");
-await app.listen({ port: 8000 });
+const port = parseInt(Deno.env.get("PORT") || "8000");
+await app.listen({ port });

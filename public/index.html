@@ -120,7 +120,6 @@
                 const response = await fetch('/api/restaurants');
                 if (!response.ok) throw new Error('Failed to load restaurants');
                 const data = await response.json();
-                console.log(data)
                 restaurantData = data;
             } catch (error) {
                 console.error('Error loading restaurants:', error);
@@ -131,7 +130,6 @@
         // Display a random restaurant from the selected theme
         function displayRandomRestaurant(theme) {
             const restaurants = theme === '랜덤 추천' ? Object.values(restaurantData).flat() : restaurantData[theme] || [];
-            console.log(restaurants)
             if (restaurants.length === 0) {
                 restaurantNameElement.textContent = '해당 테마에 등록된 식당이 없습니다.';
                 restaurantThemeElement.textContent = '';
