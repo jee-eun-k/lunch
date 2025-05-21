@@ -132,7 +132,6 @@
             const restaurants = theme === '랜덤 추천' ? Object.values(restaurantData).flat() : restaurantData[theme] || [];
             if (restaurants.length === 0) {
                 restaurantNameElement.textContent = '해당 테마에 등록된 식당이 없습니다.';
-                restaurantThemeElement.textContent = '';
                 return;
             }
 
@@ -141,17 +140,13 @@
 
             // Add animation class
             restaurantNameElement.classList.remove('fade-in');
-            restaurantThemeElement.classList.remove('fade-in');
 
             // Force reflow to restart animation
             void restaurantNameElement.offsetWidth;
-            void restaurantThemeElement.offsetWidth;
 
             // Update content and add animation class
             restaurantNameElement.textContent = restaurant;
-            restaurantThemeElement.textContent = theme;
             restaurantNameElement.classList.add('fade-in');
-            restaurantThemeElement.classList.add('fade-in');
         }
 
         // Show the add restaurant modal
