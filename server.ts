@@ -2,6 +2,7 @@ import { Application, Router } from "oak";
 import { oakCors } from "https://deno.land/x/cors@v1.2.2/mod.ts";
 
 const app = new Application();
+app.use(oakCors()); // Enable CORS for all routes
 const router = new Router();
 const DATA_FILE = "./data/restaurants.json";
 

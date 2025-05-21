@@ -100,6 +100,12 @@
     </div>
 
     <script>
+
+
+    // Add this at the top of your script section
+    const API_BASE_URL = window.location.hostname === 'localhost'
+        ? 'http://localhost:8000'
+        : window.location.origin;
         // DOM Elements
         const restaurantNameElement = document.getElementById('restaurantName');
         const restaurantThemeElement = document.getElementById('restaurantTheme');
@@ -117,7 +123,7 @@
         // Load initial data from the server
         async function loadRestaurants() {
             try {
-                const response = await fetch('/api/restaurants');
+                const response = await fetch(`${API_BASE_URL}/api/restaurants`);
                 if (!response.ok) throw new Error('Failed to load restaurants');
                 const data = await response.json();
                 restaurantData = data;
@@ -174,7 +180,7 @@
             }
 
             try {
-                const response = await fetch('/api/restaurants', {
+                const response = await fetch(`${API_BASE_URL}/api/restaurants`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
