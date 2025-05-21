@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>점심 추천</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen p-4">
+    <div class="max-w-2xl mx-auto">
+        <h1 class="text-3xl font-bold text-center my-8 text-gray-800">PM 오늘 점심 뭐 먹지? 🍚</h1>
+
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <div id="restaurantDisplay" class="text-center py-8">
+                <p id="restaurantName" class="text-2xl font-semibold text-gray-700">아래 버튼을 눌러 추천을 받아보세요!</p>
+                <p class="text-gray-500 mt-2"></p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                <button
+                    class="recommend-btn bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold py-4 px-6 rounded-lg transition-colors duration-200"
+                    data-theme="랜덤 추천">
+                    랜덤 추천
+                </button>
+                <button
+                    class="recommend-btn bg-green-100 hover:bg-green-200 text-green-800 font-semibold py-4 px-6 rounded-lg transition-colors duration-200"
+                    data-theme="해장 추천">
+                    해장 추천
+                </button>
+                <button
+                    class="recommend-btn bg-yellow-100 hover:bg-yellow-200 text-yellow-800 font-semibold py-4 px-6 rounded-lg transition-colors duration-200"
+                    data-theme="가까운곳 추천">
+                    가까운곳 추천
+                </button>
+            </div>
+
+            <div class="mt-8 text-center">
+                <button id="addRestaurantBtn"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
+                    + 식당 추가하기
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Restaurant Modal -->
+    <div id="addRestaurantModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md">
+            <h2 class="text-xl font-bold mb-4">새로운 식당 추가</h2>
+            <form id="addRestaurantForm">
+                <div class="mb-4">
+                    <label for="newRestaurantName" class="block text-gray-700 text-sm font-bold mb-2">식당명:</label>
+                    <input type="text" id="newRestaurantName" name="newRestaurantName"
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="예: 맛있는 퓨전 한식" required>
+                </div>
+                <div class="mb-6">
+                    <label for="restaurantTheme" class="block text-gray-700 text-sm font-bold mb-2">테마 선택:</label>
+                    <select id="restaurantTheme" name="restaurantTheme"
+                        class="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        required>
+                        <option value="">테마를 선택하세요</option>
+                        <option value="해장 추천">해장 추천</option>
+                        <option value="가까운곳 추천">가까운곳 추천</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" id="cancelAddBtn"
+                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded">
+                        취소
+                    </button>
+                    <button type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded">
+                        추가
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const restaurantNameElement = document.getElementById('restaurantName');
+        const restaurantThemeElement = document.getElementById('restaurantTheme');
+        const recommendButtons = document.querySelectorAll('.recommend-btn');
+        const addRestaurantBtn = document.getElementById('addRestaurantBtn');
+        const addRestaurantModal = document.getElementById('addRestaurantModal');
+        const addRestaurantForm = document.getElementById('addRestaurantForm');
+        const cancelAddBtn = document.getElementById('cancelAddBtn');
+        const restaurantThemeSelect = document.getElementById('restaurantTheme');
+        const newRestaurantNameInput = document.getElementById('newRestaurantName');
+
+        // Restaurant data (will be loaded from the server)
+        let restaurantData = {};
+
+        // Load initial data from the server
+        async function loadRestaurants() {
+            try {
+                const response = await fetch('/api/restaurants');
+                if (!response.ok) throw new Error('Failed to load restaurants');
+                const data = await response.json();
+                console.log(data)
+                restaurantData = data;
+            } catch (error) {
+                console.error('Error loading restaurants:', error);
+                alert('식당 목록을 불러오는 중 오류가 발생했습니다.');
+            }
+        }
+
+        // Display a random restaurant from the selected theme
+        function displayRandomRestaurant(theme) {
+            const restaurants = theme === '랜덤 추천' ? Object.values(restaurantData).flat() : restaurantData[theme] || [];
+            console.log(restaurants)
+            if (restaurants.length === 0) {
+                restaurantNameElement.textContent = '해당 테마에 등록된 식당이 없습니다.';
+                restaurantThemeElement.textContent = '';
+                return;
+            }
+
+            const randomIndex = Math.floor(Math.random() * restaurants.length);
+            const restaurant = restaurants[randomIndex];
+
+            // Add animation class
+            restaurantNameElement.classList.remove('fade-in');
+            restaurantThemeElement.classList.remove('fade-in');
+
+            // Force reflow to restart animation
+            void restaurantNameElement.offsetWidth;
+            void restaurantThemeElement.offsetWidth;
+
+            // Update content and add animation class
+            restaurantNameElement.textContent = restaurant;
+            restaurantThemeElement.textContent = theme;
+            restaurantNameElement.classList.add('fade-in');
+            restaurantThemeElement.classList.add('fade-in');
+        }
+
+        // Show the add restaurant modal
+        function showAddRestaurantModal() {
+            addRestaurantModal.classList.remove('hidden');
+            newRestaurantNameInput.focus();
+        }
+
+        // Hide the add restaurant modal
+        function hideAddRestaurantModal() {
+            addRestaurantModal.classList.add('hidden');
+            addRestaurantForm.reset();
+        }
+
+        // Handle form submission
+        async function handleAddRestaurant(event) {
+            event.preventDefault();
+
+            const name = newRestaurantNameInput.value.trim();
+            const theme = restaurantThemeSelect.value;
+
+            if (!name || !theme) {
+                alert('식당명과 테마를 모두 입력해주세요.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/restaurants', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, theme })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to add restaurant');
+                }
+
+                // Reload the restaurants after adding a new one
+                await loadRestaurants();
+                hideAddRestaurantModal();
+                alert('식당이 성공적으로 추가되었습니다!');
+
+            } catch (error) {
+                console.error('Error adding restaurant:', error);
+                alert(error.message || '식당을 추가하는 중 오류가 발생했습니다.');
+            }
+        }
+
+        // Event Listeners
+        recommendButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const theme = e.target.dataset.theme;
+                displayRandomRestaurant(theme);
+            });
+        });
+
+        addRestaurantBtn.addEventListener('click', showAddRestaurantModal);
+        cancelAddBtn.addEventListener('click', hideAddRestaurantModal);
+        addRestaurantForm.addEventListener('submit', handleAddRestaurant);
+
+        // Close modal when clicking outside
+        addRestaurantModal.addEventListener('click', (e) => {
+            if (e.target === addRestaurantModal) {
+                hideAddRestaurantModal();
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRestaurants();
+        });
+    </script>
+</body>
+
+</html>
