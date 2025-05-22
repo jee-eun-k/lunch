@@ -12,9 +12,9 @@ const RESTAURANTS_FILE_PATH = "./data/restaurants.json";
 const defaultRestaurantStructure: RestaurantsData = {
   "해장 추천": [],
   "가까운곳 추천": [],
-  // You can add other default themes here if needed
-  // "다이어트 추천": [],
-  // "JSP 추천": []
+  "도전 추천": [],
+  "다이어트 추천": [],
+  "JSP 추천": []
 };
 
 async function readRestaurantsFromFile(): Promise<RestaurantsData> {

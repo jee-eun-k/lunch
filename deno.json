@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "lib": ["deno.window", "deno.unstable"],
+    "lib": ["dom", "dom.iterable", "esnext", "deno.window", "deno.unstable"],
     "strict": true
   },
   "tasks": {
@@ -8,6 +8,7 @@
     "start": "deno run --allow-net --allow-read --allow-write --allow-env server.ts"
   },
   "imports": {
+    "eslint": "npm:eslint@^9.27.0",
     "oak": "https://deno.land/x/oak@v12.6.1/mod.ts"
   }
 }
