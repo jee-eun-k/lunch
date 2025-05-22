@@ -14,7 +14,7 @@ const defaultRestaurantStructure: RestaurantsData = {
   "가까운곳 추천": [],
   // You can add other default themes here if needed
   // "다이어트 추천": [],
-  // "JI 추천": []
+  // "JSP 추천": []
 };
 
 async function readRestaurantsFromFile(): Promise<RestaurantsData> {

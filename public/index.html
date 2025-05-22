@@ -4,128 +4,407 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PM 점메추</title>
+    <title>않이외않되</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        @keyframes fadeIn {
-            from {
+        /* 보노보노 PPT의 강렬한 폰트 느낌을 위해 */
+        /* 궁서체와 함께 굵고 단순한 폰트 조합 */
+        @import url('https://fonts.googleapis.com/css2?family=Gungseo&family=Do+Hyeon&family=Black+Han+Sans&display=swap');
+
+        body {
+            font-family: 'Gungseo', 'Do Hyeon', 'Black Han Sans', sans-serif;
+            background-color: #808080;
+            /* PPT의 기본 회색 배경 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+            box-sizing: border-box;
+            overflow: hidden;
+            /* 가로 스크롤 방지 */
+        }
+
+        /* 메인 컨테이너 - PPT 슬라이드 느낌 */
+        .ppt-slide {
+            background-color: #FFFFFF;
+            /* 흰색 슬라이드 배경 */
+            border: 5px solid #000000;
+            /* 굵은 검은색 테두리 */
+            box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.7);
+            /* PPT 그림자 느낌 */
+            padding: 2.5rem;
+            /* 내부 여백 */
+            max-width: 600px;
+            /* 적당한 슬라이드 크기 */
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transform: rotate(-1deg);
+            /* PPT처럼 살짝 기울이기 */
+        }
+
+        /* 제목 스타일 */
+        .ppt-title {
+            font-family: 'Black Han Sans', 'Gungseo', sans-serif;
+            /* 더 강렬한 폰트 */
+            font-size: 3.5rem;
+            /* 매우 큰 글씨 */
+            font-weight: 900;
+            color: #FFFFFF;
+            /* 흰색 텍스트 */
+            -webkit-text-stroke: 3px #000000;
+            /* 굵은 검은색 윤곽선 */
+            text-shadow: 8px 8px 0px #FF00FF, 16px 16px 0px #00FFFF;
+            /* 마젠타/사이언 이중 그림자 */
+            margin-bottom: 2rem;
+            line-height: 1.1;
+            text-align: center;
+            transform: skewY(-3deg) rotate(2deg);
+            /* 더 과감하게 기울이고 회전 */
+            position: relative;
+            z-index: 10;
+        }
+
+        /* 식당명 표시 영역 */
+        #restaurantDisplay {
+            font-family: 'Gungseo', 'Do Hyeon', sans-serif;
+            font-size: 2.8rem;
+            /* 큰 글씨 */
+            font-weight: bold;
+            color: #000000;
+            /* 검은색 텍스트 */
+            background-color: #FFFF00;
+            /* 노란색 배경 */
+            border: 4px solid #000000;
+            /* 검은색 테두리 */
+            box-shadow: 10px 10px 0px #FF0000;
+            /* 빨간색 그림자 */
+            padding: 1.5rem 1rem;
+            width: 90%;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin-bottom: 2.5rem;
+            transform: rotate(1deg);
+            /* 살짝 기울이기 */
+            position: relative;
+            overflow: hidden;
+            /* 텍스트 넘침 방지 */
+        }
+
+        /* 식당명 애니메이션 */
+        @keyframes dramatic-appear-ppt {
+            0% {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: scale(0.5) translateY(50px) rotate(-15deg);
             }
 
-            to {
+            70% {
                 opacity: 1;
-                transform: translateY(0);
+                transform: scale(1.05) translateY(-5px) rotate(5deg);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0) rotate(0deg);
             }
         }
 
-        .fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
+        .animate-dramatic-appear-ppt {
+            animation: dramatic-appear-ppt 0.7s ease-out forwards;
         }
+
+        /* 추천 버튼 스타일 */
+        .recommend-btn {
+            font-family: 'Do Hyeon', 'Gungseo', sans-serif;
+            font-size: 1.5rem;
+            /* 적당히 큰 글씨 */
+            font-weight: bold;
+            color: #FFFFFF;
+            /* 흰색 텍스트 */
+            -webkit-text-stroke: 1px #000000;
+            /* 검은색 윤곽선 */
+            border: 3px solid #000000;
+            /* 검은색 테두리 */
+            box-shadow: 7px 7px 0px rgba(0, 0, 0, 0.5);
+            /* 그림자 */
+            padding: 1rem 1.5rem;
+            transition: all 0.1s ease-out;
+            /* 클릭 시 반응 */
+            transform: rotate(0.5deg);
+            /* 살짝 기울이기 */
+            position: relative;
+            overflow: hidden;
+        }
+
+        .recommend-btn:active {
+            transform: translate(5px, 5px) rotate(0.5deg);
+            /* 클릭 시 그림자 안으로 들어가는 효과 */
+            box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 각 버튼별 배경색 (PPT 무지개 배경 참고) */
+        #randomBtn {
+            background-color: #FF0000;
+        }
+
+        /* 빨강 */
+        #challengeBtn {
+            background-color: #FF7F00;
+        }
+
+        /* 주황 */
+        #hangoverBtn {
+            background-color: #FFFF00;
+        }
+
+        /* 노랑 */
+        #nearbyBtn {
+            background-color: #00FF00;
+        }
+
+        /* 초록 */
+        #dietBtn {
+            background-color: #0000FF;
+        }
+
+        /* 파랑 */
+        #jiBtn {
+            background-color: #4B0082;
+        }
+
+        /* 남색 */
+
+        /* 플러스 버튼 (우측 상단) */
+        #addRestaurantBtn {
+            background-color: #FF1493;
+            /* 핫핑크 */
+            color: #FFFFFF;
+            /* 흰색 아이콘 */
+            -webkit-text-stroke: 1px #000000;
+            /* 검은색 윤곽선 */
+            border: 3px solid #000000;
+            /* 검은색 테두리 */
+            box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.7);
+            /* 그림자 */
+            padding: 1.2rem;
+            border-radius: 50%;
+            font-size: 2rem;
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            transform: rotate(5deg);
+            /* 살짝 기울이기 */
+            transition: all 0.1s ease-out;
+            z-index: 20;
+        }
+
+        #addRestaurantBtn:active {
+            transform: translate(5px, 5px) rotate(5deg);
+            box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.7);
+        }
+
+        /* 모달 오버레이 */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.7);
+            /* 어두운 배경 */
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 100;
+        }
+
+        /* 모달 콘텐츠 */
+        #modalContent {
+            background-color: #FFFFFF;
+            /* 흰색 모달 배경 */
+            border: 5px solid #000000;
+            /* 검은색 테두리 */
+            box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.7);
+            /* 그림자 */
+            padding: 2.5rem;
+            max-width: 450px;
+            width: 100%;
+            position: relative;
+            transform: rotate(-2deg);
+            /* 모달도 살짝 기울이기 */
+            transition: all 0.2s ease-out;
+        }
+
+        #modalContent.opacity-0 {
+            transform: scale(0.9) rotate(-2deg);
+        }
+
+        #modalContent.opacity-100 {
+            transform: scale(1) rotate(-2deg);
+        }
+
+        /* 모달 제목 */
+        .modal-title {
+            font-family: 'Black Han Sans', 'Gungseo', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #FFFFFF;
+            -webkit-text-stroke: 2px #000000;
+            text-shadow: 5px 5px 0px #FF00FF, 10px 10px 0px #00FFFF;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            transform: skewY(-2deg);
+        }
+
+        /* 입력 필드 및 셀렉트 박스 */
+        input[type="text"],
+        select {
+            font-family: 'Gungseo', 'Do Hyeon', sans-serif;
+            font-size: 1.2rem;
+            border: 3px solid #000000;
+            /* 검은색 테두리 */
+            padding: 0.8rem;
+            width: 100%;
+            margin-bottom: 1rem;
+            background-color: #FFFFFF;
+            box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.3);
+            /* 그림자 */
+            transform: rotate(0.5deg);
+            /* 살짝 기울이기 */
+        }
+
+        /* 라벨 스타일 */
+        label {
+            font-family: 'Gungseo', 'Do Hyeon', sans-serif;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333333;
+            display: block;
+            margin-bottom: 0.5rem;
+            transform: rotate(-0.5deg);
+            /* 살짝 기울이기 */
+        }
+
+        /* 모달 버튼 */
+        .modal-button {
+            font-family: 'Do Hyeon', 'Gungseo', sans-serif;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #FFFFFF;
+            -webkit-text-stroke: 1px #000000;
+            border: 3px solid #000000;
+            box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.5);
+            padding: 0.8rem 1.5rem;
+            transition: all 0.1s ease-out;
+            transform: rotate(0.5deg);
+        }
+
+        .modal-button:active {
+            transform: translate(3px, 3px) rotate(0.5deg);
+            box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+        }
+
+        #cancelAddBtn {
+            background-color: #808080;
+        }
+
+        /* 회색 */
+        #submitAddBtn {
+            background-color: #008000;
+        }
+
+        /* 초록색 */
     </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen p-4">
-    <div class="max-w-2xl mx-auto">
-        <h1 class="text-3xl font-bold text-center my-8 text-gray-800">PM 오늘 점심 뭐 먹지? 🍚</h1>
+<body
+    style="background-image: url('/img/bonobono.webp'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+    <div class="ppt-slide">
+        <button id="addRestaurantBtn">
+            <i class="fas fa-plus"></i>
+        </button>
 
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
-            <div id="restaurantDisplay" class="text-center py-8">
-                <p id="restaurantName" class="text-2xl font-semibold text-gray-700">아래 버튼을 눌러 추천을 받아보세요!</p>
-                <p id="restaurantName" class="text-sm text-gray-700">문의나 건의는 Alexa한테</p>
-                <p class="text-gray-500 mt-2"></p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                <button
-                    class="recommend-btn bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold py-4 px-6 rounded-lg transition-colors duration-200"
-                    data-theme="랜덤 추천">
-                    랜덤 추천
-                </button>
-                <button
-                    class="recommend-btn bg-green-100 hover:bg-green-200 text-green-800 font-semibold py-4 px-6 rounded-lg transition-colors duration-200"
-                    data-theme="해장 추천">
-                    해장 추천
-                </button>
-                <button
-                    class="recommend-btn bg-yellow-100 hover:bg-yellow-200 text-yellow-800 font-semibold py-4 px-6 rounded-lg transition-colors duration-200"
-                    data-theme="가까운곳 추천">
-                    가까운곳 추천
-                </button>
-                <button
-                    class="recommend-btn bg-violet-100 hover:bg-violet-200 text-violet-800 font-semibold py-4 px-6 rounded-lg transition-colors duration-200"
-                    data-theme="다이어트 추천">
-                    다이어트 추천
-                </button>
-                <button
-                    class="recommend-btn bg-pink-100 hover:bg-pink-200 text-pink-800 font-semibold py-4 px-6 rounded-lg transition-colors duration-200"
-                    data-theme="JI 추천">
-                    JI 추천
-                </button>
-            </div>
-
-            <div class="mt-8 text-center">
-                <button id="addRestaurantBtn"
-                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
-                    + 식당 추가하기
-                </button>
-            </div>
+        <h1 class="ppt-title">
+            피엠 점메추...
+        </h1>
+        <h1 class="ppt-title">
+            진짜 외않되...?엉엉!😭
+        </h1>
+        <div id="restaurantDisplay">
+            <span id="restaurantName"></span>
         </div>
+
+        <div class="grid grid-cols-2 gap-4 w-full">
+            <button id="randomBtn" class="recommend-btn" data-theme="랜덤 추천">
+                랜덤 추천
+            </button>
+            <button id="challengeBtn" class="recommend-btn" data-theme="도전 추천">
+                도전 추천
+            </button>
+            <button id="hangoverBtn" class="recommend-btn" data-theme="해장 추천">
+                해장 추천
+            </button>
+            <button id="nearbyBtn" class="recommend-btn" data-theme="가까운곳 추천">
+                가까운곳 추천
+            </button>
+            <button id="dietBtn" class="recommend-btn" data-theme="다이어트 추천">
+                다이어트 추천
+            </button>
+            <button id="jiBtn" class="recommend-btn" data-theme="JSP 추천">
+                JSP 추천
+            </button>
+            </div>
     </div>
 
-    <!-- Add Restaurant Modal -->
-    <div id="addRestaurantModal"
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-xl p-6 w-full max-w-md">
-            <h2 class="text-xl font-bold mb-4">새로운 식당 추가</h2>
+    <div id="addRestaurantModal" class="modal-overlay hidden">
+        <div id="modalContent">
+            <h2 class="modal-title">새 식당 추가</h2>
+
             <form id="addRestaurantForm">
                 <div class="mb-4">
-                    <label for="newRestaurantName" class="block text-gray-700 text-sm font-bold mb-2">식당명:</label>
-                    <input type="text" id="newRestaurantName" name="newRestaurantName"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="예: 틈새라면" required>
+                    <label for="newRestaurantName">식당명:</label>
+                    <input type="text" id="newRestaurantName" name="newRestaurantName" placeholder="예: 뽀로로 피자" required>
                 </div>
                 <div class="mb-6">
-                    <label for="restaurantTheme" class="block text-gray-700 text-sm font-bold mb-2">테마 선택:</label>
-                    <select id="restaurantTheme" name="restaurantTheme"
-                        class="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required>
-                        <option value="">테마를 선택하세요</option>
-                        <option value="해장 추천">해장 추천</option>
-                        <option value="가까운곳 추천">가까운곳 추천</option>
-                        <option value="다이어트 추천">다이어트 추천</option>
-                        <option value="JI 추천">JI 추천</option>
+                    <label for="restaurantTheme">테마 선택:</label>
+                    <select id="restaurantTheme" name="restaurantTheme" required>
                     </select>
                 </div>
                 <div class="flex justify-end gap-3">
-                    <button type="button" id="cancelAddBtn"
-                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded">
+                    <button type="button" id="cancelAddBtn" class="modal-button">
                         취소
                     </button>
-                    <button type="submit"
-                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded">
-                        추가
+                    <button type="submit" id="submitAddBtn" class="modal-button">
+                        추가!
                     </button>
                 </div>
             </form>
         </div>
     </div>
-
     <script>
 
-                                            // Add this at the top of your script section
-                                            const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:8000' : window.location.origin;
-        // DOM Elements
-        const restaurantNameElement = document.getElementById('restaurantName');
-        const restaurantThemeElement = document.getElementById('restaurantTheme');
+                                // DOM 요소 가져오기
+                                const restaurantNameElement = document.getElementById('restaurantName');
         const recommendButtons = document.querySelectorAll('.recommend-btn');
         const addRestaurantBtn = document.getElementById('addRestaurantBtn');
         const addRestaurantModal = document.getElementById('addRestaurantModal');
-        const addRestaurantForm = document.getElementById('addRestaurantForm');
-        const cancelAddBtn = document.getElementById('cancelAddBtn');
-        const restaurantThemeSelect = document.getElementById('restaurantTheme');
+                                const modalContent = document.getElementById('modalContent');
+                                const addRestaurantForm = document.getElementById('addRestaurantForm');
         const newRestaurantNameInput = document.getElementById('newRestaurantName');
+                                const restaurantThemeSelect = document.getElementById('restaurantTheme');
+                                const cancelAddBtn = document.getElementById('cancelAddBtn');
+                                const submitAddBtn = document.getElementById('submitAddBtn'); // 추가 버튼 ID 변경
+
+                                const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:8000' : window.location.origin;
 
         // Restaurant data (will be loaded from the server)
         let restaurantData = {};
@@ -142,7 +421,7 @@
                 }
 
                 const data = await response.json();
-                // console.table(data);
+                console.table(data);
                 restaurantData = data;
             } catch (error) {
                 console.error('Error loading restaurants:', error);
@@ -151,98 +430,185 @@
             }
         }
 
-        // Display a random restaurant from the selected theme
-        function displayRandomRestaurant(theme) {
-            const restaurants = theme === '랜덤 추천' ? Object.values(restaurantData).flat() : restaurantData[theme] || [];
-            if (restaurants.length === 0) {
-                restaurantNameElement.textContent = '해당 테마에 등록된 식당이 없습니다.';
-                return;
-            }
+                addRestaurantBtn.addEventListener('click', showAddRestaurantModal);
+                cancelAddBtn.addEventListener('click', hideAddRestaurantModal);
+                addRestaurantForm.addEventListener('submit', handleAddRestaurant);
 
-            const randomIndex = Math.floor(Math.random() * restaurants.length);
-            const restaurant = restaurants[randomIndex];
-
-            // Add animation class
-            restaurantNameElement.classList.remove('fade-in');
-
-            // Force reflow to restart animation
-            void restaurantNameElement.offsetWidth;
-
-            // Update content and add animation class
-            restaurantNameElement.textContent = restaurant;
-            restaurantNameElement.classList.add('fade-in');
-        }
-
-        // Show the add restaurant modal
-        function showAddRestaurantModal() {
-            addRestaurantModal.classList.remove('hidden');
-            newRestaurantNameInput.focus();
-        }
-
-        // Hide the add restaurant modal
-        function hideAddRestaurantModal() {
-            addRestaurantModal.classList.add('hidden');
-            addRestaurantForm.reset();
-        }
-
-        // Handle form submission
-        async function handleAddRestaurant(event) {
-            event.preventDefault();
-
-            const name = newRestaurantNameInput.value.trim();
-            const theme = restaurantThemeSelect.value;
-
-            try {
-                // console.log('Sending request to:', `${API_BASE_URL}/api/restaurants`);
-                const response = await fetch(`${API_BASE_URL}/api/restaurants`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ name, theme })
+                // Load initial data from the server
+                document.addEventListener('DOMContentLoaded', () => {
+                    loadRestaurants();
                 });
+                                // Display a random restaurant from the selected theme
+                                function displayRandomRestaurant(theme) {
+                                    const restaurants = theme === '랜덤 추천' ? Object.values(restaurantData).flat() : restaurantData[theme] || [];
+                                    if (restaurants.length === 0) {
+                                        restaurantNameElement.textContent = '해당 테마에 등록된 식당이 없습니다.';
+                                        return;
+                                    }
 
-                const responseData = await response.json().catch(() => ({}));
-                // console.log('Server response:', { status: response.status, data: responseData });
+                                const randomIndex = Math.floor(Math.random() * restaurants.length);
+                                const restaurant = restaurants[randomIndex];
 
-                if (!response.ok) {
-                    throw new Error(responseData.details || responseData.error || 'Failed to add restaurant');
+                                // Add animation class
+                                restaurantNameElement.classList.remove('fade-in');
+
+                                // Force reflow to restart animation
+                                void restaurantNameElement.offsetWidth;
+
+                                // Update content and add animation class
+                                restaurantNameElement.textContent = restaurant;
+                                restaurantNameElement.classList.add('fade-in');
+                                }
+
+                                /**
+                                 * 식당명을 드라마틱한 애니메이션과 함께 표시합니다.
+                                 * @param {string} name - 표시할 식당명
+                                 */
+                                function displayRestaurant(name) {
+                                    // 기존 애니메이션 클래스와 내용 제거
+                                    restaurantNameElement.classList.remove('animate-dramatic-appear-ppt');
+                                    restaurantNameElement.textContent = '';
+
+                                    // 애니메이션 재시작을 위한 강제 리플로우
+                                    void restaurantNameElement.offsetWidth;
+
+                                    // 새 내용 설정 및 애니메이션 클래스 추가
+                                    restaurantNameElement.textContent = name;
+                                    restaurantNameElement.classList.add('animate-dramatic-appear-ppt');
+                                }
+
+                                /**
+                                 * 추천 버튼 클릭을 처리합니다.
+                                 * 버튼 텍스트(테마)에 따라 무작위 식당을 선택합니다.
+                                 * @param {Event} event - 클릭 이벤트 객체.
+                                 */
+                                function handleRecommendation(event) {
+                                    const theme = event.target.dataset.theme; // data-theme 속성 사용
+                                    const restaurants = restaurantData[theme];
+
+                                    if (restaurants && restaurants.length > 0) {
+                                        const randomIndex = Math.floor(Math.random() * restaurants.length);
+                                        const recommendedRestaurant = restaurants[randomIndex];
+                                        displayRestaurant(recommendedRestaurant);
+                                    } else {
+                                        displayRestaurant("추천할 식당이 없어요! 엉엉 😭"); // 해당 테마에 식당 없음
+                                    }
+                                }
+
+                                /**
+                                 * 식당 추가 모달의 테마 선택 드롭다운을 채웁니다.
+                                 */
+                                function populateThemeSelect() {
+                                    restaurantThemeSelect.innerHTML = ''; // 기존 옵션 지우기
+                                    for (const theme in restaurantData) {
+                                        const option = document.createElement('option');
+                                        option.value = theme;
+                                        option.textContent = theme;
+                                        restaurantThemeSelect.appendChild(option);
+                                    }
+                                    // 새 테마 추가 옵션
+                                    const newThemeOption = document.createElement('option');
+                                    newThemeOption.value = "새 테마 추가";
+                                    newThemeOption.textContent = "새 테마 추가...";
+                                    restaurantThemeSelect.appendChild(newThemeOption);
+        }
+
+                                /**
+                                 * 식당 추가 모달을 애니메이션과 함께 표시합니다.
+                                 */
+                                function showModal() {
+            addRestaurantModal.classList.remove('hidden');
+                                // 애니메이션 트리거
+                                setTimeout(() => {
+                                    modalContent.classList.remove('opacity-0', 'scale-95');
+                                    modalContent.classList.add('opacity-100', 'scale-100');
+                                }, 10); // CSS 전환이 적용될 작은 지연
+                                populateThemeSelect();
+                                newRestaurantNameInput.focus(); // 입력 필드에 포커스
+        }
+
+                                /**
+                                 * 식당 추가 모달을 애니메이션과 함께 숨깁니다.
+                                 */
+                                function hideModal() {
+                                    modalContent.classList.remove('opacity-100', 'scale-100');
+                                    modalContent.classList.add('opacity-0', 'scale-95');
+                                    setTimeout(() => {
+                                        addRestaurantModal.classList.add('hidden');
+                                    addRestaurantForm.reset(); // 폼 필드 초기화
+                                }, 200); // 애니메이션 완료 대기 시간 줄임
+                                loadRestaurants();
+        }
+
+                                /**
+                                 * 식당 추가 폼 제출을 처리합니다.
+                                 * 새 식당을 데이터 구조에 추가합니다.
+                                 * @param {Event} event - 폼 제출 이벤트 객체
+                                 */
+                                function handleAddRestaurant(event) {
+                                    event.preventDefault(); // 기본 폼 제출 방지
+
+                                const newRestaurantName = newRestaurantNameInput.value.trim();
+                                let selectedTheme = restaurantThemeSelect.value;
+
+                                if (newRestaurantName === "") {
+                                    // 사용자에게 알림 (PPT 스타일로 변경)
+                                    alert("식당명을 입력해주세요! (제발...)");
+                                    return;
                 }
 
-                await loadRestaurants();
-                hideAddRestaurantModal();
-                alert('식당이 성공적으로 추가되었습니다!');
+                                if (selectedTheme === "새 테마 추가") {
+                                    const customTheme = prompt("새로운 테마 이름을 입력해주세요! (예: '매운맛 추천')");
+                                    if (customTheme && customTheme.trim() !== "") {
+                                        selectedTheme = customTheme.trim();
+                                        if (!restaurantData[selectedTheme]) {
+                                            restaurantData[selectedTheme] = [];
+                                        }
+                                    } else {
+                                        // 사용자가 취소하거나 빈 테마를 입력함
+                                        alert("테마 추가를 취소했어요... (할많하않)");
+                                        return;
+                                    }
+                                }
 
-            } catch (error) {
-                console.error('Error details:', error);
-                alert(`오류가 발생했습니다: ${error.message}`);
+                                if (!restaurantData[selectedTheme]) {
+                                    restaurantData[selectedTheme] = [];
             }
+                                restaurantData[selectedTheme].push(newRestaurantName);
+
+                                console.log("업데이트된 식당 데이터:", restaurantData);
+                                hideModal(); // 추가 후 모달 숨기기
+                                alert(`"${newRestaurantName}" 식당이 "${selectedTheme}" 테마에 추가되었어요! (신뢰지만...)`);
         }
 
-        // Event Listeners
-        recommendButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                const theme = e.target.dataset.theme;
-                displayRandomRestaurant(theme);
-            });
-        });
-
-        addRestaurantBtn.addEventListener('click', showAddRestaurantModal);
-        cancelAddBtn.addEventListener('click', hideAddRestaurantModal);
+                                // 이벤트 리스너
+                                recommendButtons.forEach(button => {
+                                    button.addEventListener('click', handleRecommendation);
+                                });
+                                // Event Listeners
+                                recommendButtons.forEach(button => {
+                                    button.addEventListener('click', (e) => {
+                                        const theme = e.target.dataset.theme;
+                                        displayRandomRestaurant(theme);
+                                    });
+                                });
+                                addRestaurantBtn.addEventListener('click', showModal);
+                                cancelAddBtn.addEventListener('click', hideModal);
         addRestaurantForm.addEventListener('submit', handleAddRestaurant);
 
-        // Close modal when clicking outside
-        addRestaurantModal.addEventListener('click', (e) => {
-            if (e.target === addRestaurantModal) {
-                hideAddRestaurantModal();
+                                // 모달 바깥 클릭 시 닫기
+                                addRestaurantModal.addEventListener('click', (event) => {
+                                    if (event.target === addRestaurantModal) {
+                                        hideModal();
             }
         });
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            loadRestaurants();
-        });
+                                // 초기 표시 또는 환영 메시지
+                                displayRestaurant("");
     </script>
 </body>
+<footer class="absolute bottom-0 left-0 right-0 text-center">
+    태흥빌딩 603호 알렉사 만듬
+</footer>
 
 </html>
