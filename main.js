@@ -40,7 +40,6 @@ async function loadRestaurants() {
       throw new Error(errorData.details || "Failed to load restaurants");
     }
     const data = await response.json();
-    console.table(data);
     restaurantData = data;
   } catch (error) {
     console.error("Error loading restaurants:", error);
@@ -77,7 +76,7 @@ function handleRecommendation(event) {
   const target = event.target;
   const theme = target.dataset.theme || null;
   if (!theme) return;
-  const restaurants = theme === "랜덤 추천"
+  const restaurants = theme === "random"
     ? Object.values(restaurantData).flat()
     : restaurantData[theme];
 
@@ -99,10 +98,10 @@ function populateThemeSelect() {
     option.textContent = theme;
     restaurantThemeSelect.appendChild(option);
   }
-  const newThemeOption = document.createElement("option");
-  newThemeOption.value = "새 테마 추가";
-  newThemeOption.textContent = "새 테마 추가...";
-  restaurantThemeSelect.appendChild(newThemeOption);
+  // const newThemeOption = document.createElement("option");
+  // newThemeOption.value = "새 테마 추가";
+  // newThemeOption.textContent = "새 테마 추가...";
+  // restaurantThemeSelect.appendChild(newThemeOption);
 }
 
 function showModal() {

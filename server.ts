@@ -2,6 +2,100 @@
 
 import { Application, Router, send } from "oak";
 import { oakCors } from "https://deno.land/x/cors@v1.2.2/mod.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
+
+// Load environment variables from .env file
+import "https://deno.land/std@0.207.0/dotenv/load.ts";
+
+// Initialize Supabase client
+const supabaseUrl = Deno.env.get("SUPABASE_URL");
+const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error("Missing Supabase environment variables. Check your .env file.");
+}
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Replace readRestaurantsFromFile
+async function readRestaurantsFromDB(): Promise<RestaurantsData> {
+  const { data, error } = await supabase
+    .from("restaurants")
+    .select("name, theme");
+
+  if (error) {
+    console.error("Error reading from Supabase:", error);
+    throw error;
+  }
+
+  // Transform to your existing format
+  const restaurants: RestaurantsData = {};
+  data?.forEach(({ name, theme }) => {
+    if (!restaurants[theme]) {
+      restaurants[theme] = [];
+    }
+    restaurants[theme].push(name);
+  });
+
+  return restaurants;
+}
+// Helper function to get all themes with their restaurants
+async function getAllThemesWithRestaurants(): Promise<Record<string, string[]>> {
+  try {
+    // First get all themes
+    const { data: themes, error: themesError } = await supabase
+      .from('themes')
+      .select('id, name');
+
+    if (themesError) throw themesError;
+
+    // If no themes exist yet, return empty object
+    if (!themes || themes.length === 0) {
+      return {};
+    }
+
+    // Get all restaurants with their theme names
+    const { data: restaurants, error: restaurantsError } = await supabase
+      .from('restaurants')
+      .select('name, themes!inner(name)');
+
+    if (restaurantsError) throw restaurantsError;
+
+    // Transform to the expected format
+    const result: Record<string, string[]> = {};
+    
+    // Initialize all themes
+    themes.forEach(theme => {
+      result[theme.name] = [];
+    });
+
+    // Add restaurants to their themes
+    if (restaurants) {
+      restaurants.forEach(restaurant => {
+        const themeName = (restaurant.themes as { name: string })?.name;
+        if (themeName && result[themeName]) {
+          result[themeName].push(restaurant.name);
+        }
+      });
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error in getAllThemesWithRestaurants:', error);
+    throw error;
+  }
+}
+// Replace writeRestaurantsToFile
+async function saveRestaurantToDB(name: string, theme: string): Promise<void> {
+  const { error } = await supabase
+    .from("restaurants")
+    .insert([{ name, theme }]);
+
+  if (error) {
+    console.error("Error saving to Supabase:", error);
+    throw error;
+  }
+}
+
 
 // Define the type for your restaurant data
 type RestaurantsData = Record<string, string[]>;
@@ -84,23 +178,17 @@ app.use(router.allowedMethods());
 // API: Get all restaurants
 router.get("/api/restaurants", async (context) => {
   try {
-    console.log(`Attempting to GET restaurants from ${RESTAURANTS_FILE_PATH}...`);
-    const restaurants = await readRestaurantsFromFile();
-    console.log("Data read from file:", restaurants);
-    context.response.type = "application/json";
+    const restaurants = await getAllThemesWithRestaurants();
     context.response.body = restaurants;
   } catch (error) {
-    const err = error as Error;
-    console.error("Error serving restaurants:", err.message, err.stack);
+    console.error("Error fetching restaurants:", error);
     context.response.status = 500;
-    context.response.body = {
-      error: "Failed to load restaurants",
-      details: err.message,
-    };
+    context.response.body = { error: "Failed to load restaurants" };
   }
 });
 
-// API: Add a new restaurant
+
+// Update the POST /api/restaurants endpoint
 router.post("/api/restaurants", async (context) => {
   try {
     const body = await context.request.body().value;
@@ -112,51 +200,52 @@ router.post("/api/restaurants", async (context) => {
       return;
     }
 
-    console.log(
-      `Attempting to POST to file. Theme: "${theme}", Restaurant: "${name}"`,
-    );
+    // First, try to get the theme
+    let { data: themeData, error: themeError } = await supabase
+      .from('themes')
+      .select('id')
+      .eq('name', theme)
+      .maybeSingle();
 
-    const currentRestaurants = await readRestaurantsFromFile();
-    console.log(
-      "Current restaurants from file (before update):",
-      currentRestaurants,
-    );
+    // If theme doesn't exist, create it
+    if (!themeData) {
+      const { data: newTheme, error: createThemeError } = await supabase
+        .from('themes')
+        .insert({ name: theme })
+        .select()
+        .single();
 
-    if (!currentRestaurants[theme]) {
-      console.log(
-        `Theme "${theme}" not found in file, initializing as empty array.`,
-      );
-      currentRestaurants[theme] = [];
+      if (createThemeError) throw createThemeError;
+      themeData = newTheme;
+    } else if (themeError) {
+      throw themeError;
     }
 
-    let dataChanged = false;
-    if (!currentRestaurants[theme].includes(name)) {
-      currentRestaurants[theme].push(name);
-      console.log(
-        `Added "${name}" to theme "${theme}". New list for theme:`,
-        currentRestaurants[theme],
-      );
-      dataChanged = true;
-    } else {
-      console.log(
-        `Restaurant "${name}" already exists in theme "${theme}". No changes made to data.`,
-      );
-    }
+    // Now add the restaurant with the theme's ID
+    const { error: restaurantError } = await supabase
+      .from('restaurants')
+      .insert([{ 
+        name, 
+        theme_id: themeData.id 
+      }]);
 
-    if (dataChanged) {
-      console.log("Writing updated restaurants data to file:", currentRestaurants);
-      await writeRestaurantsToFile(currentRestaurants);
-      console.log("File write operation successful.");
-    }
+    if (restaurantError) throw restaurantError;
 
-    context.response.body = { success: true, dataChanged };
+    context.response.body = { 
+      success: true, 
+      dataChanged: true 
+    };
   } catch (error) {
-    const err = error as Error;
-    console.error("Error adding restaurant to file:", err.message, err.stack);
+    console.error("Error adding restaurant:", error);
     context.response.status = 500;
-    context.response.body = {
+    
+    const errorMessage = error instanceof Error 
+      ? error.message 
+      : 'An unknown error occurred';
+      
+    context.response.body = { 
       error: "Failed to save restaurant",
-      details: err.message,
+      details: errorMessage
     };
   }
 });
