@@ -123,15 +123,23 @@
         // Load initial data from the server
         async function loadRestaurants() {
             try {
-                const response = await fetch(`${API_BASE_URL}/api/restaurants`);
-                if (!response.ok) throw new Error('Failed to load restaurants');
-                const data = await response.json();
-                restaurantData = data;
-            } catch (error) {
-                console.error('Error loading restaurants:', error);
-                alert('식당 목록을 불러오는 중 오류가 발생했습니다.');
+            console.log('Loading restaurants...');
+            const response = await fetch(`${API_BASE_URL}/api/restaurants`);
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.details || 'Failed to load restaurants');
             }
+
+            const data = await response.json();
+            console.log('Loaded restaurants:', data);
+            restaurantData = data;
+        } catch (error) {
+            console.error('Error loading restaurants:', error);
+            // Show a user-friendly error message
+            alert('식당 목록을 불러오는 중 오류가 발생했습니다. 새로고침 후 다시 시도해주세요.');
         }
+    }
 
         // Display a random restaurant from the selected theme
         function displayRandomRestaurant(theme) {
@@ -174,33 +182,32 @@
             const name = newRestaurantNameInput.value.trim();
             const theme = restaurantThemeSelect.value;
 
-            if (!name || !theme) {
-                alert('식당명과 테마를 모두 입력해주세요.');
-                return;
-            }
+            console.log("Form data:", { name, theme });
 
             try {
-                const response = await fetch(`${API_BASE_URL}/api/restaurants`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ name, theme })
-                });
+            console.log('Sending request to:', `${API_BASE_URL}/api/restaurants`);
+            const response = await fetch(`${API_BASE_URL}/api/restaurants`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, theme })
+            });
 
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Failed to add restaurant');
-                }
+            const responseData = await response.json().catch(() => ({}));
+            console.log('Server response:', { status: response.status, data: responseData });
 
-                // Reload the restaurants after adding a new one
-                await loadRestaurants();
-                hideAddRestaurantModal();
-                alert('식당이 성공적으로 추가되었습니다!');
+            if (!response.ok) {
+                throw new Error(responseData.details || responseData.error || 'Failed to add restaurant');
+            }
 
-            } catch (error) {
-                console.error('Error adding restaurant:', error);
-                alert(error.message || '식당을 추가하는 중 오류가 발생했습니다.');
+            await loadRestaurants();
+            hideAddRestaurantModal();
+            alert('식당이 성공적으로 추가되었습니다!');
+
+        } catch (error) {
+                console.error('Error details:', error);
+                alert(`오류가 발생했습니다: ${error.message}`);
             }
         }
 

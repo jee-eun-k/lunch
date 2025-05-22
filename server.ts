@@ -46,49 +46,74 @@ app.use(async (context) => {
   }
 });
 
-// API: Get all restaurants
-router.get("/api/restaurants", async (context) => {
-  try {
-    const data = await Deno.readTextFile(DATA_FILE);
-    context.response.body = data;
-  } catch (error) {
-    console.error("Error reading data:", error);
-    context.response.status = 500;
-    context.response.body = { error: "Failed to load data" };
-  }
-});
-
 // API: Add a new restaurant
 router.post("/api/restaurants", async (context) => {
   try {
-    const { name, theme } = await context.request.body().value;
+    console.log("Received request to add restaurant");
+    const body = await context.request.body().value;
+    console.log("Request body:", body);
+    
+    const { name, theme } = body;
+    console.log("Parsed name and theme:", { name, theme });
 
     if (!name || !theme) {
+      console.log("Missing name or theme");
       context.response.status = 400;
       context.response.body = { error: "Name and theme are required" };
       return;
     }
 
+    console.log("Reading data file...");
     const data = JSON.parse(await Deno.readTextFile(DATA_FILE));
+    console.log("Current data:", data);
 
     if (!data[theme]) {
+      console.log(`Creating new theme: ${theme}`);
       data[theme] = [];
     } else if (data[theme].includes(name)) {
+      console.log(`Restaurant "${name}" already exists in theme "${theme}"`);
       context.response.status = 400;
-      context.response.body = {
-        error: "This restaurant already exists in the selected theme",
-      };
+      context.response.body = { error: "This restaurant already exists in the selected theme" };
       return;
     }
 
+    console.log(`Adding "${name}" to theme "${theme}"`);
     data[theme].push(name);
+    
+    console.log("Writing updated data to file...");
     await Deno.writeTextFile(DATA_FILE, JSON.stringify(data, null, 2));
+    console.log("Successfully updated data file");
 
     context.response.body = { success: true };
   } catch (error) {
-    console.error("Error saving restaurant:", error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    console.error("Error in POST /api/restaurants:", error);
     context.response.status = 500;
-    context.response.body = { error: "Failed to save restaurant" };
+    context.response.body = { 
+      error: "Failed to save restaurant",
+      details: errorMessage 
+    };
+  }
+});
+
+// API: Get all restaurants
+router.get("/api/restaurants", async (context) => {
+  try {
+    console.log("Fetching restaurants data...");
+    const data = await Deno.readTextFile(DATA_FILE);
+    console.log("Successfully read restaurants data");
+    
+    // Set proper content type
+    context.response.type = "application/json";
+    context.response.body = data;
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Failed to load data';
+    console.error("Error reading restaurants data:", error);
+    context.response.status = 500;
+    context.response.body = { 
+      error: "Failed to load restaurants",
+      details: errorMessage 
+    };
   }
 });
 const port = parseInt(Deno.env.get("PORT") || "8000");
