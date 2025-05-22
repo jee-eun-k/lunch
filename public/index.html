@@ -408,7 +408,17 @@
 
         // Restaurant data (will be loaded from the server)
         let restaurantData = {};
+                    // Show the add restaurant modal
+                    function showAddRestaurantModal() {
+                        addRestaurantModal.classList.remove('hidden');
+                        newRestaurantNameInput.focus();
+                    }
 
+        // Hide the add restaurant modal
+        function hideAddRestaurantModal() {
+            addRestaurantModal.classList.add('hidden');
+            addRestaurantForm.reset();
+        }
         // Load initial data from the server
         async function loadRestaurants() {
             try {
