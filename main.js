@@ -1,42 +1,21 @@
 // DOM 요소 가져오기
-const restaurantNameElement = document.getElementById("restaurantName") as
-  | HTMLElement
-  | null;
+const restaurantNameElement = document.getElementById("restaurantName");
 const recommendButtons = document.querySelectorAll(".recommend-btn");
-const addRestaurantBtn = document.getElementById("addRestaurantBtn") as
-  | HTMLElement
-  | null;
-const addRestaurantModal = document.getElementById("addRestaurantModal") as
-  | HTMLElement
-  | null;
-const modalContent = document.getElementById("modalContent") as
-  | HTMLElement
-  | null;
-const addRestaurantForm = document.getElementById("addRestaurantForm") as
-  | HTMLFormElement
-  | null;
-const newRestaurantNameInput = document.getElementById("newRestaurantName") as
-  | HTMLInputElement
-  | null;
-const restaurantThemeSelect = document.getElementById("restaurantTheme") as
-  | HTMLSelectElement
-  | null;
-const cancelAddBtn = document.getElementById("cancelAddBtn") as
-  | HTMLElement
-  | null;
-// const submitAddBtn = document.getElementById('submitAddBtn') as HTMLElement | null; // submitAddBtn is already declared in the HTML by USER
+const addRestaurantBtn = document.getElementById("addRestaurantBtn");
+const addRestaurantModal = document.getElementById("addRestaurantModal");
+const modalContent = document.getElementById("modalContent");
+const addRestaurantForm = document.getElementById("addRestaurantForm");
+const newRestaurantNameInput = document.getElementById("newRestaurantName");
+const restaurantThemeSelect = document.getElementById("restaurantTheme");
+const cancelAddBtn = document.getElementById("cancelAddBtn");
 
-const API_BASE_URL: string = window.location.hostname === "localhost"
+const API_BASE_URL = globalThis.location.hostname === "localhost"
   ? "http://localhost:8000"
-  : window.location.origin;
+  : globalThis.location.origin;
 
-interface RestaurantData {
-  [theme: string]: string[];
-}
+let restaurantData = {};
 
-let restaurantData: RestaurantData = {};
-
-function showAddRestaurantModal(): void {
+function showAddRestaurantModal() {
   if (addRestaurantModal) {
     addRestaurantModal.classList.remove("hidden");
   }
@@ -45,7 +24,7 @@ function showAddRestaurantModal(): void {
   }
 }
 
-function hideAddRestaurantModal(): void {
+function hideAddRestaurantModal() {
   if (addRestaurantModal) {
     addRestaurantModal.classList.add("hidden");
   }
@@ -53,14 +32,14 @@ function hideAddRestaurantModal(): void {
     addRestaurantForm.reset();
   }
 }
-async function loadRestaurants(): Promise<void> {
+async function loadRestaurants() {
   try {
-    const response: Response = await fetch(`${API_BASE_URL}/api/restaurants`);
+    const response = await fetch(`${API_BASE_URL}/api/restaurants`);
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.details || "Failed to load restaurants");
     }
-    const data: RestaurantData = await response.json();
+    const data = await response.json();
     console.table(data);
     restaurantData = data;
   } catch (error) {
@@ -85,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadRestaurants();
 });
 
-function displayRestaurant(name: string): void {
+function displayRestaurant(name) {
   if (!restaurantNameElement) return;
   restaurantNameElement.classList.remove("animate-dramatic-appear-ppt");
   restaurantNameElement.textContent = "";
@@ -94,39 +73,39 @@ function displayRestaurant(name: string): void {
   restaurantNameElement.classList.add("animate-dramatic-appear-ppt");
 }
 
-function handleRecommendation(event: Event): void {
-  const target = event.target as HTMLButtonElement;
-  const theme: string | null = target.dataset.theme || null;
+function handleRecommendation(event) {
+  const target = event.target;
+  const theme = target.dataset.theme || null;
   if (!theme) return;
-  const restaurants: string[] | undefined = theme === "랜덤 추천"
+  const restaurants = theme === "랜덤 추천"
     ? Object.values(restaurantData).flat()
     : restaurantData[theme];
 
   if (restaurants && restaurants.length > 0) {
-    const randomIndex: number = Math.floor(Math.random() * restaurants.length);
-    const recommendedRestaurant: string = restaurants[randomIndex];
+    const randomIndex = Math.floor(Math.random() * restaurants.length);
+    const recommendedRestaurant = restaurants[randomIndex];
     displayRestaurant(recommendedRestaurant);
   } else {
     displayRestaurant("추천할 식당이 없어요! 엉엉 😭");
   }
 }
 
-function populateThemeSelect(): void {
+function populateThemeSelect() {
   if (!restaurantThemeSelect) return;
   restaurantThemeSelect.innerHTML = ""; // 기존 옵션 지우기
   for (const theme in restaurantData) {
-    const option: HTMLOptionElement = document.createElement("option");
+    const option = document.createElement("option");
     option.value = theme;
     option.textContent = theme;
     restaurantThemeSelect.appendChild(option);
   }
-  const newThemeOption: HTMLOptionElement = document.createElement("option");
+  const newThemeOption = document.createElement("option");
   newThemeOption.value = "새 테마 추가";
   newThemeOption.textContent = "새 테마 추가...";
   restaurantThemeSelect.appendChild(newThemeOption);
 }
 
-function showModal(): void {
+function showModal() {
   if (addRestaurantModal) {
     addRestaurantModal.classList.remove("hidden");
   }
@@ -142,7 +121,7 @@ function showModal(): void {
   }
 }
 
-function hideModal(): void {
+function hideModal() {
   if (modalContent) {
     modalContent.classList.remove("opacity-100", "scale-100");
     modalContent.classList.add("opacity-0", "scale-95");
@@ -158,12 +137,12 @@ function hideModal(): void {
   loadRestaurants();
 }
 
-async function handleAddRestaurant(event: Event): Promise<void> {
+async function handleAddRestaurant(event) {
   event.preventDefault();
   if (!newRestaurantNameInput || !restaurantThemeSelect) return;
 
-  const newRestaurantName: string = newRestaurantNameInput.value.trim();
-  let selectedTheme: string = restaurantThemeSelect.value;
+  const newRestaurantName = newRestaurantNameInput.value.trim();
+  let selectedTheme = restaurantThemeSelect.value;
 
   if (newRestaurantName === "") {
     alert("식당명을 입력해주세요! (제발...)");
@@ -171,7 +150,7 @@ async function handleAddRestaurant(event: Event): Promise<void> {
   }
 
   if (selectedTheme === "새 테마 추가") {
-    const customTheme: string | null = prompt(
+    const customTheme = prompt(
       "새로운 테마 이름을 입력해주세요! (예: '매운맛 추천')",
     );
     if (customTheme && customTheme.trim() !== "") {
@@ -228,19 +207,9 @@ async function handleAddRestaurant(event: Event): Promise<void> {
   // as they are now handled within the try/catch block.
 }
 
-recommendButtons.forEach((button: Element) => {
+recommendButtons.forEach((button) => {
   button.addEventListener("click", handleRecommendation);
 });
-
-// Event Listeners for recommendButtons (already assigned above, this is a duplicate from user's code)
-// recommendButtons.forEach(button => {
-//     button.addEventListener('click', (e) => {
-//         const theme = (e.target as HTMLElement).dataset.theme;
-//         if (theme) {
-//             displayRandomRestaurant(theme);
-//         }
-//     });
-// });
 
 if (addRestaurantBtn) {
   addRestaurantBtn.addEventListener("click", showModal);
@@ -253,7 +222,7 @@ if (addRestaurantForm) {
 }
 
 if (addRestaurantModal) {
-  addRestaurantModal.addEventListener("click", (event: MouseEvent) => {
+  addRestaurantModal.addEventListener("click", (event) => {
     if (event.target === addRestaurantModal) {
       hideModal();
     }

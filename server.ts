@@ -58,6 +58,26 @@ const router = new Router();
 
 // Middleware
 app.use(oakCors()); // Enable CORS for all routes
+
+// NEW: Middleware to serve main.js from the root
+app.use(async (context, next) => {
+  if (context.request.url.pathname === "/main.js") {
+    try {
+      await send(context, context.request.url.pathname, {
+        root: `${Deno.cwd()}`, // Serve from project root
+        // index: "main.js", // Not strictly necessary for a direct file path but good practice
+      });
+    } catch {
+      // If main.js is not found in root, or other error, pass to next middleware
+      await next();
+    }
+  } else {
+    // If not requesting /main.js, pass to the next middleware
+    await next();
+  }
+});
+
+// Existing router
 app.use(router.routes());
 app.use(router.allowedMethods());
 

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext", "deno.window", "deno.unstable"],
+    "lib": ["esnext", "deno.window", "deno.unstable"],
     "strict": true
   },
   "tasks": {
